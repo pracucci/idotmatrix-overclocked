@@ -40,12 +40,13 @@ Display text on the iDot display with optional animations.
 
 ```bash
 ./idm-cli text --text "HELLO"
+./idm-cli text --text "FIRE!" --animation fireworks --color red
 ```
 
 Options:
 - `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
 - `--text` (required): Text to display (uppercase A-Z, 0-9, punctuation)
-- `--animation`: Animation type (none, blink, appear, appear-disappear)
+- `--animation`: Animation type (see `--help` for options)
 - `--color`: Text color (white, red, green, blue, yellow, etc.)
 - `--verbose`: Enable verbose debug logging
 

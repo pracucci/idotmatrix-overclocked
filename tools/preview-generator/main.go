@@ -59,12 +59,12 @@ func main() {
 	fmt.Println("All previews generated successfully!")
 }
 
-// generateTextPreview creates a text animation preview using "LOVE" in red.
+// generateTextPreview creates a text animation preview using fireworks with "FIRE!" in red.
 func generateTextPreview(outputPath string) error {
 	opts := text.DefaultAnimationOptions()
 	opts.TextColor = graphic.Red
 	opts.ShadowColor = graphic.DarkRed
-	img := text.GenerateAppearDisappearText("LOVE", opts)
+	img := text.GenerateFireworksText("FIRE!", opts)
 
 	gifBytes, err := img.GIFBytes()
 	if err != nil {

@@ -22,6 +22,24 @@ var (
 	textVerbose    bool
 )
 
+// animationTypesHelp returns a formatted help string for all animation types.
+func animationTypesHelp() string {
+	var sb strings.Builder
+	for _, at := range text.AnimationTypes {
+		sb.WriteString("  ")
+		sb.WriteString(at.Name)
+		// Pad to align descriptions
+		padding := 18 - len(at.Name)
+		if padding > 0 {
+			sb.WriteString(strings.Repeat(" ", padding))
+		}
+		sb.WriteString("- ")
+		sb.WriteString(at.Description)
+		sb.WriteString("\n")
+	}
+	return sb.String()
+}
+
 var TextCmd = &cobra.Command{
 	Use:   "text",
 	Short: "Displays text on the 64x64 iDot display",
@@ -30,11 +48,7 @@ var TextCmd = &cobra.Command{
 Text is automatically word-wrapped to fit the display width.
 
 Animation options:
-  none              - Static centered text (default)
-  blink             - Text blinks on/off (loops forever)
-  appear            - Letters appear one by one (plays once)
-  appear-disappear  - Letters appear then disappear (loops forever)
-
+` + animationTypesHelp() + `
 Color options: ` + strings.Join(graphic.ColorNames(), ", ") + `
 
 Examples:
@@ -56,7 +70,7 @@ func init() {
 	TextCmd.Flags().StringVar(&textMsg, "text", "", "Text to display (uppercase A-Z, 0-9, space, basic punctuation)")
 	TextCmd.MarkFlagRequired("text")
 
-	TextCmd.Flags().StringVar(&textAnimation, "animation", "none", "Animation type: none, blink, appear, appear-disappear")
+	TextCmd.Flags().StringVar(&textAnimation, "animation", "none", "Animation type: "+text.AnimationTypeNamesString())
 	TextCmd.Flags().StringVar(&textColorName, "color", "white", fmt.Sprintf("Text color (%s)", strings.Join(graphic.ColorNames(), ", ")))
 	TextCmd.Flags().BoolVar(&textVerbose, "verbose", false, "Enable verbose debug logging")
 }
@@ -65,9 +79,6 @@ func doShowText(logger log.Logger) error {
 	if len(textMsg) == 0 {
 		return fmt.Errorf("missing --text option")
 	}
-
-	// Normalize animation flag
-	animation := strings.ToLower(strings.TrimSpace(textAnimation))
 
 	// Convert text to uppercase (font only has uppercase)
 	msg := strings.ToUpper(textMsg)
@@ -90,19 +101,10 @@ func doShowText(logger log.Logger) error {
 	opts := text.DefaultAnimationOptions()
 	opts.TextOptions.TextColor = color
 	opts.TextOptions.ShadowColor = graphic.ShadowFor(color)
-	var image *graphic.Image
 
-	switch animation {
-	case "none", "static":
-		image = text.GenerateStaticText(msg, opts.TextOptions)
-	case "blink":
-		image = text.GenerateBlinkingText(msg, opts)
-	case "appear":
-		image = text.GenerateAppearingText(msg, opts)
-	case "appear-disappear", "appear-and-disappear":
-		image = text.GenerateAppearDisappearText(msg, opts)
-	default:
-		return fmt.Errorf("unknown animation type: %s (valid: none, blink, appear, appear-disappear)", animation)
+	image, errMsg := text.GenerateAnimation(textAnimation, msg, opts)
+	if errMsg != "" {
+		return fmt.Errorf("%s", errMsg)
 	}
 
 	// Connect to device
