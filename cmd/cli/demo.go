@@ -72,6 +72,7 @@ func doDemo(logger log.Logger) error {
 		{"emoji: thumbsup", generateEmojiGIF("thumbsup"), 3 * time.Second},
 		{"emoji: rofl", generateEmojiGIF("rofl"), 3 * time.Second},
 		{"grot: halloween-4", generateGrotGIF("halloween-4"), 3 * time.Second},
+		{"grot: matrix", generateGrotGIF("matrix"), 4 * time.Second},
 		{"fire", generateFireGIF(), 3 * time.Second},
 		{"text: FIRE! (fireworks)", generateTextGIF("FIRE!", "fireworks", graphic.Red), 4 * time.Second},
 		{"text: LGTM (appear-disappear)", generateTextGIF("LGTM", "appear-disappear", graphic.Green), 4 * time.Second},
