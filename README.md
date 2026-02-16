@@ -18,6 +18,8 @@ All commands support automatic device discovery. If `--target` is not specified,
 
 ### snake
 
+<img src="docs/assets/snake-preview.gif" width="128" height="128" alt="Snake Preview">
+
 Play Snake on the iDot display with progressive difficulty levels.
 
 ```bash
@@ -31,6 +33,8 @@ Options:
 Controls: WASD or Arrow keys to move, Q to quit
 
 ### text
+
+<img src="docs/assets/text-preview.gif" width="128" height="128" alt="Text Preview">
 
 Display text on the iDot display with optional animations.
 
@@ -112,6 +116,8 @@ Options:
 
 ### emoji
 
+<img src="docs/assets/emoji-preview.gif" width="128" height="128" alt="Emoji Preview">
+
 Display an animated emoji on the iDot display.
 
 ```bash
@@ -144,3 +150,22 @@ Options:
 - `--verbose`: Enable verbose debug logging
 
 The slideshow loops forever until interrupted with Ctrl+C.
+
+### grot
+
+<img src="docs/assets/grot-preview.gif" width="128" height="128" alt="Grot Preview">
+
+Display a Halloween-themed animation on the iDot display.
+
+```bash
+./idm-cli grot --name halloween-1
+./idm-cli grot --name halloween-3
+./idm-cli grot --name halloween-5
+```
+
+Options:
+- `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
+- `--name` (required): Grot name (halloween-1, halloween-2, halloween-3, halloween-4, halloween-5, halloween-6, halloween-7)
+- `--verbose`: Enable verbose debug logging
+
+Grot animations from Giphy.

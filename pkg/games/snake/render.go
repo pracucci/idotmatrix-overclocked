@@ -1,21 +1,21 @@
 package snake
 
-// Color palette
+// Color palette (exported colors are used by preview generator)
 var (
 	black       = [3]uint8{0, 0, 0}
 	darkGreen   = [3]uint8{0, 100, 0}
-	green       = [3]uint8{0, 200, 0}
-	brightGreen = [3]uint8{50, 255, 50}
+	Green       = [3]uint8{0, 200, 0}       // Snake body color
+	BrightGreen = [3]uint8{50, 255, 50}     // Snake head color
 	darkRed     = [3]uint8{100, 0, 0}
-	red         = [3]uint8{255, 0, 0}
+	Red         = [3]uint8{255, 0, 0}       // Food color
 	white       = [3]uint8{255, 255, 255}
 	gray        = [3]uint8{80, 80, 80}
 
 	// Obstacle colors
-	rockColor     = [3]uint8{55, 55, 60}    // Dark gray with slight blue tint
-	rockColorAlt  = [3]uint8{50, 50, 55}    // Slightly darker variation
-	lakeColor     = [3]uint8{35, 70, 135}   // Blue
-	lakeColorAlt  = [3]uint8{40, 80, 145}   // Lighter wave variation
+	rockColor    = [3]uint8{55, 55, 60}  // Dark gray with slight blue tint
+	rockColorAlt = [3]uint8{50, 50, 55}  // Slightly darker variation
+	lakeColor    = [3]uint8{35, 70, 135} // Blue
+	lakeColorAlt = [3]uint8{40, 80, 145} // Lighter wave variation
 )
 
 // Brown palette - limited to 2 colors due to display constraints
@@ -109,7 +109,7 @@ func drawCoiledSnake(img []byte, cx, cy int) {
 		if i%3 == 0 {
 			color = darkGreen
 		} else {
-			color = green
+			color = Green
 		}
 		setPixel(img, cx+p.x, cy+p.y, color)
 		// Make snake thicker
@@ -118,19 +118,19 @@ func drawCoiledSnake(img []byte, cx, cy int) {
 
 	// Draw head at the end of the coil (outer position)
 	headX, headY := cx-8, cy-3
-	setPixel(img, headX, headY, brightGreen)
-	setPixel(img, headX, headY-1, brightGreen)
-	setPixel(img, headX-1, headY, brightGreen)
-	setPixel(img, headX-1, headY-1, brightGreen)
+	setPixel(img, headX, headY, BrightGreen)
+	setPixel(img, headX, headY-1, BrightGreen)
+	setPixel(img, headX-1, headY, BrightGreen)
+	setPixel(img, headX-1, headY-1, BrightGreen)
 
 	// Eyes
 	setPixel(img, headX-1, headY-1, white)
 	setPixel(img, headX, headY-1, white)
 
 	// Tongue
-	setPixel(img, headX-2, headY, red)
-	setPixel(img, headX-3, headY-1, red)
-	setPixel(img, headX-3, headY+1, red)
+	setPixel(img, headX-2, headY, Red)
+	setPixel(img, headX-3, headY-1, Red)
+	setPixel(img, headX-3, headY+1, Red)
 }
 
 // drawDeadSnake draws a flat dead snake with X eyes
@@ -149,7 +149,7 @@ func drawDeadSnake(img []byte, cx, cy int) {
 		if i%2 == 0 {
 			color = darkGreen
 		} else {
-			color = green
+			color = Green
 		}
 		setPixel(img, cx+p.x, cy+p.y, color)
 		setPixel(img, cx+p.x, cy+p.y+1, color)
@@ -157,18 +157,18 @@ func drawDeadSnake(img []byte, cx, cy int) {
 
 	// Draw head
 	headX, headY := cx+8, cy
-	drawRect(img, headX, headY-1, 4, 4, green)
+	drawRect(img, headX, headY-1, 4, 4, Green)
 
 	// X eyes (dead)
-	setPixel(img, headX, headY-1, red)
-	setPixel(img, headX+1, headY, red)
-	setPixel(img, headX+1, headY-1, red)
-	setPixel(img, headX, headY, red)
+	setPixel(img, headX, headY-1, Red)
+	setPixel(img, headX+1, headY, Red)
+	setPixel(img, headX+1, headY-1, Red)
+	setPixel(img, headX, headY, Red)
 
-	setPixel(img, headX+2, headY-1, red)
-	setPixel(img, headX+3, headY, red)
-	setPixel(img, headX+3, headY-1, red)
-	setPixel(img, headX+2, headY, red)
+	setPixel(img, headX+2, headY-1, Red)
+	setPixel(img, headX+3, headY, Red)
+	setPixel(img, headX+3, headY-1, Red)
+	setPixel(img, headX+2, headY, Red)
 }
 
 // GenerateCoverImage creates the title screen with "SNAKE" text and coiled snake
@@ -198,12 +198,12 @@ func GenerateCoverImage() []byte {
 		setPixel(img, c[0], c[1]+1, darkGreen)
 	}
 
-	// Draw "SNAKE" title at top (centered)
+	// Draw "SNAKE" title at top (centeRed)
 	// "SNAKE" is 5 chars * 6 pixels = 30 pixels wide, center at (64-30)/2 = 17
 	// Draw shadow first
 	drawText(img, "SNAKE", 18, 7, [3]uint8{0, 50, 0})
 	// Draw main text
-	drawText(img, "SNAKE", 17, 6, brightGreen)
+	drawText(img, "SNAKE", 17, 6, BrightGreen)
 
 	// Draw coiled snake in center
 	drawCoiledSnake(img, 32, 38)
@@ -252,7 +252,7 @@ func generateVoronoiBackground() []byte {
 	regionMap := make([]int, 64*64)
 	for y := 0; y < 64; y++ {
 		for x := 0; x < 64; x++ {
-			minDist := 64*64 + 64*64 // max possible squared distance
+			minDist := 64*64 + 64*64 // max possible squaRed distance
 			nearestSeed := 0
 			for i, s := range seeds {
 				dx := x - s.x
@@ -367,7 +367,7 @@ func GenerateBackgroundWithObstacles(gameMap *Map) []byte {
 func GenerateGameOverImage() []byte {
 	img := make([]byte, 64*64*3)
 
-	// Dark red tinted background
+	// Dark Red tinted background
 	for y := 0; y < 64; y++ {
 		for x := 0; x < 64; x++ {
 			intensity := uint8(20 + y/4)
@@ -375,14 +375,14 @@ func GenerateGameOverImage() []byte {
 		}
 	}
 
-	// Draw "GAME" and "OVER" text centered on screen
+	// Draw "GAME" and "OVER" text centeRed on screen
 	// Each word is 4 chars * 6 pixels = 24 pixels wide, center at (64-24)/2 = 20
 	// Total height: 7 + 3 gap + 7 = 17 pixels, center at (64-17)/2 = 23
 	shadowColor := [3]uint8{50, 0, 0}
 	drawText(img, "GAME", 21, 25, shadowColor)
-	drawText(img, "GAME", 20, 24, red)
+	drawText(img, "GAME", 20, 24, Red)
 	drawText(img, "OVER", 21, 35, shadowColor)
-	drawText(img, "OVER", 20, 34, red)
+	drawText(img, "OVER", 20, 34, Red)
 
 	return img
 }
