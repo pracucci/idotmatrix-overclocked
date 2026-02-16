@@ -159,6 +159,19 @@ Packet: [0x0A, 0x00, 0x05, 0x01, 0x00, R, G, B, X, Y]
 
 Coordinates: (0,0) = top-left, (63,63) = bottom-right
 
+### SetPowerState
+
+Turns the display on or off.
+
+```
+Packet: [0x05, 0x00, 0x07, 0x01, state]
+```
+
+| State | Description |
+|-------|-------------|
+| 0x00 | Power off |
+| 0x01 | Power on |
+
 ### SetClockMode
 
 Displays a clock with configurable style and color.

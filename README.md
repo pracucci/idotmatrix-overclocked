@@ -74,6 +74,30 @@ Options:
 - `--color`: Clock color (default: white)
 - `--verbose`: Enable verbose debug logging
 
+### on
+
+Turn the iDot display on.
+
+```bash
+./idm-cli on
+```
+
+Options:
+- `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
+- `--verbose`: Enable verbose debug logging
+
+### off
+
+Turn the iDot display off.
+
+```bash
+./idm-cli off
+```
+
+Options:
+- `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
+- `--verbose`: Enable verbose debug logging
+
 ### discover
 
 Discover nearby Bluetooth devices.

@@ -24,6 +24,8 @@ func init() {
 	rootCmd.AddCommand(EmojiSlideshowCmd)
 	rootCmd.AddCommand(FireCmd)
 	rootCmd.AddCommand(ClockCmd)
+	rootCmd.AddCommand(OffCmd)
+	rootCmd.AddCommand(OnCmd)
 	rootCmd.AddCommand(ShowgifCmd)
 	rootCmd.AddCommand(ShowimageCmd)
 	rootCmd.AddCommand(TextCmd)
