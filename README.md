@@ -85,3 +85,38 @@ Discover nearby Bluetooth devices.
 Options:
 - `--scan-time`: Max number of seconds to perform scan. 0 means infinite
 - `--verbose`: Verbose output during scan
+
+### emoji
+
+Display an animated emoji on the iDot display.
+
+```bash
+./idm-cli emoji --name thumbsup
+./idm-cli emoji --name party
+./idm-cli emoji --name rocket
+```
+
+Options:
+- `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
+- `--name` (required): Emoji name (thumbsup, thumbsdown, hearthands, clap, joy, rofl, party, scream, rage, scared, mindblow, coldface, hotface, robot, sparkles, tada, 100, confetti, risinghands, rocket, birthday)
+- `--verbose`: Enable verbose debug logging
+
+Aliases: `+1` for thumbsup, `-1` for thumbsdown, `lol` for rofl
+
+Emoji animations from [Noto Emoji Animation](https://googlefonts.github.io/noto-emoji-animation/) by Google.
+
+### emoji-slideshow
+
+Display all emojis in a slideshow, cycling through each one.
+
+```bash
+./idm-cli emoji-slideshow
+./idm-cli emoji-slideshow --interval 5
+```
+
+Options:
+- `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
+- `--interval`: Seconds to display each emoji (default: 3)
+- `--verbose`: Enable verbose debug logging
+
+The slideshow loops forever until interrupted with Ctrl+C.
