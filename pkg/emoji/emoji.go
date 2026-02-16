@@ -68,15 +68,6 @@ func Names() []string {
 	return names
 }
 
-// PrimaryNames returns the primary name for each emoji (no aliases).
-func PrimaryNames() []string {
-	var names []string
-	for _, e := range registry {
-		names = append(names, e.Names[0])
-	}
-	return names
-}
-
 // Generate creates an animated Image for the given emoji name.
 func Generate(name string) (*graphic.Image, error) {
 	emoji := Lookup(name)

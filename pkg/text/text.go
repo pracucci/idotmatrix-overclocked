@@ -47,11 +47,6 @@ func DrawTextCentered(buf []byte, text string, opts TextOptions) (x, y int) {
 	return x, y
 }
 
-// SplitLines splits text by newlines into separate lines.
-func SplitLines(text string) []string {
-	return strings.Split(text, "\n")
-}
-
 // WrapText wraps text to fit within the display width.
 // Words are kept together when possible; long words are broken character by character.
 func WrapText(text string) []string {

@@ -51,15 +51,6 @@ func Names() []string {
 	return names
 }
 
-// PrimaryNames returns the primary name for each grot (no aliases).
-func PrimaryNames() []string {
-	var names []string
-	for _, g := range registry {
-		names = append(names, g.Names[0])
-	}
-	return names
-}
-
 // Generate creates an animated Image for the given grot name.
 func Generate(name string) (*graphic.Image, error) {
 	g := Lookup(name)

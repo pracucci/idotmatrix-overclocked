@@ -53,15 +53,6 @@ func setPixel(img []byte, x, y int, color [3]uint8) {
 	img[offset+2] = color[2]
 }
 
-// drawRect draws a filled rectangle
-func drawRect(img []byte, x, y, w, h int, color [3]uint8) {
-	for dy := 0; dy < h; dy++ {
-		for dx := 0; dx < w; dx++ {
-			setPixel(img, x+dx, y+dy, color)
-		}
-	}
-}
-
 // drawChar draws a single character at the given position using 5x7 font
 func drawChar(img []byte, char rune, x, y int, color [3]uint8) {
 	data, ok := font5x7[char]
@@ -131,44 +122,6 @@ func drawCoiledSnake(img []byte, cx, cy int) {
 	setPixel(img, headX-2, headY, Red)
 	setPixel(img, headX-3, headY-1, Red)
 	setPixel(img, headX-3, headY+1, Red)
-}
-
-// drawDeadSnake draws a flat dead snake with X eyes
-func drawDeadSnake(img []byte, cx, cy int) {
-	// Draw a wavy flat snake body
-	bodyPoints := []struct{ x, y int }{
-		{-20, 2}, {-19, 1}, {-18, 0}, {-17, 0}, {-16, 1}, {-15, 2}, {-14, 2},
-		{-13, 1}, {-12, 0}, {-11, 0}, {-10, 1}, {-9, 2}, {-8, 2},
-		{-7, 1}, {-6, 0}, {-5, 0}, {-4, 0}, {-3, 0}, {-2, 0}, {-1, 0}, {0, 0},
-		{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0},
-	}
-
-	// Draw body with alternating shades
-	for i, p := range bodyPoints {
-		var color [3]uint8
-		if i%2 == 0 {
-			color = darkGreen
-		} else {
-			color = Green
-		}
-		setPixel(img, cx+p.x, cy+p.y, color)
-		setPixel(img, cx+p.x, cy+p.y+1, color)
-	}
-
-	// Draw head
-	headX, headY := cx+8, cy
-	drawRect(img, headX, headY-1, 4, 4, Green)
-
-	// X eyes (dead)
-	setPixel(img, headX, headY-1, Red)
-	setPixel(img, headX+1, headY, Red)
-	setPixel(img, headX+1, headY-1, Red)
-	setPixel(img, headX, headY, Red)
-
-	setPixel(img, headX+2, headY-1, Red)
-	setPixel(img, headX+3, headY, Red)
-	setPixel(img, headX+3, headY-1, Red)
-	setPixel(img, headX+2, headY, Red)
 }
 
 // GenerateCoverImage creates the title screen with "SNAKE" text and coiled snake
