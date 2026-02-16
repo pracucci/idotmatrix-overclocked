@@ -13,6 +13,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/pracucci/idotmatrix-overclocked/pkg/fire"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/games/snake"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/graphic"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/text"
@@ -49,6 +50,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	fmt.Println("Generating fire preview...")
+	if err := generateFirePreview("docs/assets/fire-preview.gif"); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to generate fire preview: %v\n", err)
+		os.Exit(1)
+	}
+
 	fmt.Println("All previews generated successfully!")
 }
 
@@ -75,6 +82,12 @@ func generateEmojiPreview(outputPath string) error {
 // generateGrotPreview copies the halloween-1 GIF to the output path.
 func generateGrotPreview(outputPath string) error {
 	return copyFile("pkg/grot/assets/halloween-1.gif", outputPath)
+}
+
+// generateFirePreview generates a DOOM-style fire animation.
+func generateFirePreview(outputPath string) error {
+	gifData := fire.GenerateGIF()
+	return os.WriteFile(outputPath, gifData, 0644)
 }
 
 // generateSnakePreview creates a snake game preview GIF with three phases:

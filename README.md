@@ -51,6 +51,8 @@ Options:
 
 ### fire
 
+<img src="docs/assets/fire-preview.gif" width="128" height="128" alt="Fire Preview">
+
 Generate and display a DOOM-style fire animation.
 
 ```bash
