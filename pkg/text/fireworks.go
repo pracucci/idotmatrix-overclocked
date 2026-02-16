@@ -246,7 +246,7 @@ func GenerateFireworksText(text string, opts AnimationOptions) *graphic.Image {
 			}
 		}
 
-		frames = append(frames, rgbToPaletted(buf))
+		frames = append(frames, graphic.RGBToPaletted(buf))
 		delays = append(delays, fwFrameDelay)
 	}
 

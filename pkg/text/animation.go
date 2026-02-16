@@ -2,9 +2,6 @@ package text
 
 import (
 	"image"
-	"image/color"
-	"image/color/palette"
-	"image/draw"
 	"image/gif"
 
 	"github.com/pracucci/idotmatrix-overclocked/pkg/graphic"
@@ -30,25 +27,6 @@ func DefaultAnimationOptions() AnimationOptions {
 	}
 }
 
-// rgbToPaletted converts an RGB buffer to a paletted image for GIF encoding.
-func rgbToPaletted(rgbBuf []byte) *image.Paletted {
-	rgba := image.NewRGBA(image.Rect(0, 0, graphic.DisplayWidth, graphic.DisplayHeight))
-	for y := 0; y < graphic.DisplayHeight; y++ {
-		for x := 0; x < graphic.DisplayWidth; x++ {
-			offset := (y*graphic.DisplayWidth + x) * 3
-			rgba.Set(x, y, color.RGBA{
-				R: rgbBuf[offset],
-				G: rgbBuf[offset+1],
-				B: rgbBuf[offset+2],
-				A: 255,
-			})
-		}
-	}
-	paletted := image.NewPaletted(rgba.Bounds(), palette.Plan9)
-	draw.Draw(paletted, paletted.Bounds(), rgba, image.Point{}, draw.Src)
-	return paletted
-}
-
 // GenerateBlinkingText creates a blinking text animation.
 // Frame 1: Text ON (centered, shadowed)
 // Frame 2: Background only
@@ -68,7 +46,7 @@ func GenerateBlinkingText(text string, opts AnimationOptions) *graphic.Image {
 	offBuf := graphic.NewBufferWithColor(opts.Background)
 
 	g := &gif.GIF{
-		Image:     []*image.Paletted{rgbToPaletted(onBuf), rgbToPaletted(offBuf)},
+		Image:     []*image.Paletted{graphic.RGBToPaletted(onBuf), graphic.RGBToPaletted(offBuf)},
 		Delay:     []int{opts.FrameDelay, opts.BlinkOffDelay},
 		LoopCount: 0, // Loop forever
 	}
@@ -170,7 +148,7 @@ func GenerateAppearingText(text string, opts AnimationOptions) *graphic.Image {
 		return &graphic.Image{
 			Type: graphic.ImageTypeAnimated,
 			GIFData: &gif.GIF{
-				Image:     []*image.Paletted{rgbToPaletted(buf)},
+				Image:     []*image.Paletted{graphic.RGBToPaletted(buf)},
 				Delay:     []int{65535}, // Max delay (~10 min)
 				LoopCount: 0,
 			},
@@ -188,7 +166,7 @@ func GenerateAppearingText(text string, opts AnimationOptions) *graphic.Image {
 		return &graphic.Image{
 			Type: graphic.ImageTypeAnimated,
 			GIFData: &gif.GIF{
-				Image:     []*image.Paletted{rgbToPaletted(buf)},
+				Image:     []*image.Paletted{graphic.RGBToPaletted(buf)},
 				Delay:     []int{65535},
 				LoopCount: 0,
 			},
@@ -204,7 +182,7 @@ func GenerateAppearingText(text string, opts AnimationOptions) *graphic.Image {
 
 	// Frame 0: Background only
 	bgBuf := graphic.NewBufferWithColor(opts.Background)
-	frames = append(frames, rgbToPaletted(bgBuf))
+	frames = append(frames, graphic.RGBToPaletted(bgBuf))
 	delays = append(delays, opts.LetterDelay)
 
 	// Frames 1..N: progressively more letters across all lines
@@ -232,7 +210,7 @@ func GenerateAppearingText(text string, opts AnimationOptions) *graphic.Image {
 			charCount -= len(lineRunes)
 		}
 
-		frames = append(frames, rgbToPaletted(buf))
+		frames = append(frames, graphic.RGBToPaletted(buf))
 		if i == totalChars {
 			// Final frame: max delay to simulate non-looping (~10 minutes)
 			delays = append(delays, 65535)
@@ -262,7 +240,7 @@ func GenerateAppearDisappearText(text string, opts AnimationOptions) *graphic.Im
 		return &graphic.Image{
 			Type: graphic.ImageTypeAnimated,
 			GIFData: &gif.GIF{
-				Image:     []*image.Paletted{rgbToPaletted(buf)},
+				Image:     []*image.Paletted{graphic.RGBToPaletted(buf)},
 				Delay:     []int{opts.HoldDelay},
 				LoopCount: 0,
 			},
@@ -280,7 +258,7 @@ func GenerateAppearDisappearText(text string, opts AnimationOptions) *graphic.Im
 		return &graphic.Image{
 			Type: graphic.ImageTypeAnimated,
 			GIFData: &gif.GIF{
-				Image:     []*image.Paletted{rgbToPaletted(buf)},
+				Image:     []*image.Paletted{graphic.RGBToPaletted(buf)},
 				Delay:     []int{opts.HoldDelay},
 				LoopCount: 0,
 			},
@@ -320,7 +298,7 @@ func GenerateAppearDisappearText(text string, opts AnimationOptions) *graphic.Im
 			}
 		}
 
-		frames = append(frames, rgbToPaletted(buf))
+		frames = append(frames, graphic.RGBToPaletted(buf))
 		if i == totalChars {
 			delays = append(delays, opts.HoldDelay) // Hold on full text
 		} else {
@@ -367,7 +345,7 @@ func GenerateAppearDisappearText(text string, opts AnimationOptions) *graphic.Im
 			}
 		}
 
-		frames = append(frames, rgbToPaletted(buf))
+		frames = append(frames, graphic.RGBToPaletted(buf))
 		if i == totalChars {
 			delays = append(delays, opts.HoldDelay) // Hold on empty
 		} else {

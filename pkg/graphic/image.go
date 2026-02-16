@@ -3,6 +3,10 @@ package graphic
 import (
 	"bytes"
 	"fmt"
+	"image"
+	"image/color"
+	"image/color/palette"
+	"image/draw"
 	"image/gif"
 )
 
@@ -77,4 +81,43 @@ func SetPixel(buf []byte, x, y int, color Color) {
 	buf[offset] = color[0]
 	buf[offset+1] = color[1]
 	buf[offset+2] = color[2]
+}
+
+// ImageToRGB converts an image.Image to a 64x64x3 RGB buffer.
+func ImageToRGB(img image.Image) []byte {
+	buf := make([]byte, BufferSize)
+	bounds := img.Bounds()
+	for y := 0; y < DisplayHeight; y++ {
+		for x := 0; x < DisplayWidth; x++ {
+			srcX := bounds.Min.X + x
+			srcY := bounds.Min.Y + y
+			if srcX < bounds.Max.X && srcY < bounds.Max.Y {
+				r, g, b, _ := img.At(srcX, srcY).RGBA()
+				offset := (y*DisplayWidth + x) * 3
+				buf[offset] = uint8(r >> 8)
+				buf[offset+1] = uint8(g >> 8)
+				buf[offset+2] = uint8(b >> 8)
+			}
+		}
+	}
+	return buf
+}
+
+// RGBToPaletted converts an RGB buffer to a paletted image for GIF encoding.
+func RGBToPaletted(rgbBuf []byte) *image.Paletted {
+	rgba := image.NewRGBA(image.Rect(0, 0, DisplayWidth, DisplayHeight))
+	for y := 0; y < DisplayHeight; y++ {
+		for x := 0; x < DisplayWidth; x++ {
+			offset := (y*DisplayWidth + x) * 3
+			rgba.Set(x, y, color.RGBA{
+				R: rgbBuf[offset],
+				G: rgbBuf[offset+1],
+				B: rgbBuf[offset+2],
+				A: 255,
+			})
+		}
+	}
+	paletted := image.NewPaletted(rgba.Bounds(), palette.Plan9)
+	draw.Draw(paletted, paletted.Bounds(), rgba, image.Point{}, draw.Src)
+	return paletted
 }

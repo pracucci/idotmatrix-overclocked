@@ -27,6 +27,7 @@ var registry = []Grot{
 	{Names: []string{"halloween-5"}, Filename: "halloween-5.gif"},
 	{Names: []string{"halloween-6"}, Filename: "halloween-6.gif"},
 	{Names: []string{"halloween-7"}, Filename: "halloween-7.gif"},
+	{Names: []string{"matrix"}, Filename: ""}, // Procedurally generated
 }
 
 // Lookup finds a grot by name (case-insensitive).
@@ -56,6 +57,15 @@ func Generate(name string) (*graphic.Image, error) {
 	g := Lookup(name)
 	if g == nil {
 		return nil, fmt.Errorf("unknown grot: %s (available: %s)", name, strings.Join(Names(), ", "))
+	}
+
+	// Special case for procedurally generated grots
+	if g.Filename == "" {
+		switch name {
+		case "matrix":
+			return GenerateMatrix()
+		}
+		return nil, fmt.Errorf("unknown procedural grot: %s", name)
 	}
 
 	data, err := assets.Grot.ReadFile("grot/" + g.Filename)

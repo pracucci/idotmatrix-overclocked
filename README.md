@@ -156,17 +156,14 @@ The demo loops forever until interrupted with Ctrl+C.
 
 <img src="pkg/assets/preview/grot-preview.gif" width="128" height="128" alt="Grot Preview">
 
-Display a Halloween-themed animation on the iDot display.
+Display an animation on the iDot display.
 
 ```bash
+./idm-cli grot --name matrix
 ./idm-cli grot --name halloween-1
-./idm-cli grot --name halloween-3
-./idm-cli grot --name halloween-5
 ```
 
 Options:
 - `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
-- `--name` (required): Grot name (halloween-1, halloween-2, halloween-3, halloween-4, halloween-5, halloween-6, halloween-7)
+- `--name` (required): Grot name (run `./idm-cli grot --help` for available options)
 - `--verbose`: Enable verbose debug logging
-
-Grot animations from Giphy.

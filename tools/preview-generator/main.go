@@ -6,52 +6,53 @@ package main
 import (
 	"fmt"
 	"image"
-	"image/color"
-	"image/color/palette"
-	"image/draw"
 	"image/gif"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/pracucci/idotmatrix-overclocked/pkg/fire"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/games/snake"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/graphic"
+	"github.com/pracucci/idotmatrix-overclocked/pkg/grot"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/text"
 )
 
 
+const previewDir = "pkg/assets/preview"
+
 func main() {
-	if err := os.MkdirAll("docs/assets", 0755); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create docs/assets directory: %v\n", err)
+	if err := os.MkdirAll(previewDir, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to create %s directory: %v\n", previewDir, err)
 		os.Exit(1)
 	}
 
 	fmt.Println("Generating text preview...")
-	if err := generateTextPreview("docs/assets/text-preview.gif"); err != nil {
+	if err := generateTextPreview(filepath.Join(previewDir, "text-preview.gif")); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to generate text preview: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Println("Generating emoji preview...")
-	if err := generateEmojiPreview("docs/assets/emoji-preview.gif"); err != nil {
+	if err := generateEmojiPreview(filepath.Join(previewDir, "emoji-preview.gif")); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to generate emoji preview: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Println("Generating grot preview...")
-	if err := generateGrotPreview("docs/assets/grot-preview.gif"); err != nil {
+	if err := generateGrotPreview(filepath.Join(previewDir, "grot-preview.gif")); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to generate grot preview: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Println("Generating snake preview...")
-	if err := generateSnakePreview("docs/assets/snake-preview.gif"); err != nil {
+	if err := generateSnakePreview(filepath.Join(previewDir, "snake-preview.gif")); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to generate snake preview: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Println("Generating fire preview...")
-	if err := generateFirePreview("docs/assets/fire-preview.gif"); err != nil {
+	if err := generateFirePreview(filepath.Join(previewDir, "fire-preview.gif")); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to generate fire preview: %v\n", err)
 		os.Exit(1)
 	}
@@ -76,12 +77,22 @@ func generateTextPreview(outputPath string) error {
 
 // generateEmojiPreview copies the party emoji GIF to the output path.
 func generateEmojiPreview(outputPath string) error {
-	return copyFile("pkg/emoji/assets/party.gif", outputPath)
+	return copyFile(filepath.Join("pkg", "assets", "emoji", "party.gif"), outputPath)
 }
 
-// generateGrotPreview copies the halloween-1 GIF to the output path.
+// generateGrotPreview generates the matrix animation GIF.
 func generateGrotPreview(outputPath string) error {
-	return copyFile("pkg/grot/assets/halloween-1.gif", outputPath)
+	img, err := grot.GenerateMatrix()
+	if err != nil {
+		return fmt.Errorf("failed to generate matrix: %w", err)
+	}
+
+	gifBytes, err := img.GIFBytes()
+	if err != nil {
+		return fmt.Errorf("failed to encode grot GIF: %w", err)
+	}
+
+	return os.WriteFile(outputPath, gifBytes, 0644)
 }
 
 // generateFirePreview generates a DOOM-style fire animation.
@@ -100,7 +111,7 @@ func generateSnakePreview(outputPath string) error {
 
 	// Phase 1: Cover image (1 second = 100 centiseconds)
 	coverBuf := snake.GenerateCoverImage()
-	coverFrame := rgbToPaletted(coverBuf)
+	coverFrame := graphic.RGBToPaletted(coverBuf)
 	frames = append(frames, coverFrame)
 	delays = append(delays, 100) // 1 second
 
@@ -114,7 +125,7 @@ func generateSnakePreview(outputPath string) error {
 
 	levelFrames := text.GenerateAppearingFrames("LEVEL 1", levelOpts)
 	for _, frame := range levelFrames {
-		frames = append(frames, rgbToPaletted(frame.Data))
+		frames = append(frames, graphic.RGBToPaletted(frame.Data))
 		delays = append(delays, frame.Delay)
 	}
 
@@ -151,7 +162,7 @@ func generateSnakePreview(outputPath string) error {
 			setPixelRGB(frameBuf, segment.x, segment.y, col[0], col[1], col[2])
 		}
 
-		frames = append(frames, rgbToPaletted(frameBuf))
+		frames = append(frames, graphic.RGBToPaletted(frameBuf))
 		delays = append(delays, 10) // 100ms per frame
 
 		// Move snake right (shift all segments)
@@ -180,25 +191,6 @@ func generateSnakePreview(outputPath string) error {
 	}
 
 	return nil
-}
-
-// rgbToPaletted converts an RGB buffer to a paletted image for GIF encoding.
-func rgbToPaletted(rgbBuf []byte) *image.Paletted {
-	rgba := image.NewRGBA(image.Rect(0, 0, graphic.DisplayWidth, graphic.DisplayHeight))
-	for y := 0; y < graphic.DisplayHeight; y++ {
-		for x := 0; x < graphic.DisplayWidth; x++ {
-			offset := (y*graphic.DisplayWidth + x) * 3
-			rgba.Set(x, y, color.RGBA{
-				R: rgbBuf[offset],
-				G: rgbBuf[offset+1],
-				B: rgbBuf[offset+2],
-				A: 255,
-			})
-		}
-	}
-	paletted := image.NewPaletted(rgba.Bounds(), palette.Plan9)
-	draw.Draw(paletted, paletted.Bounds(), rgba, image.Point{}, draw.Src)
-	return paletted
 }
 
 // setPixelRGB sets a single pixel in the RGB image buffer.
