@@ -18,7 +18,7 @@ All commands support automatic device discovery. If `--target` is not specified,
 
 ### snake
 
-<img src="docs/assets/snake-preview.gif" width="128" height="128" alt="Snake Preview">
+<img src="pkg/assets/preview/snake-preview.gif" width="128" height="128" alt="Snake Preview">
 
 Play Snake on the iDot display with progressive difficulty levels.
 
@@ -34,7 +34,7 @@ Controls: WASD or Arrow keys to move, Q to quit
 
 ### text
 
-<img src="docs/assets/text-preview.gif" width="128" height="128" alt="Text Preview">
+<img src="pkg/assets/preview/text-preview.gif" width="128" height="128" alt="Text Preview">
 
 Display text on the iDot display with optional animations.
 
@@ -52,7 +52,7 @@ Options:
 
 ### fire
 
-<img src="docs/assets/fire-preview.gif" width="128" height="128" alt="Fire Preview">
+<img src="pkg/assets/preview/fire-preview.gif" width="128" height="128" alt="Fire Preview">
 
 Generate and display a DOOM-style fire animation.
 
@@ -119,7 +119,7 @@ Options:
 
 ### emoji
 
-<img src="docs/assets/emoji-preview.gif" width="128" height="128" alt="Emoji Preview">
+<img src="pkg/assets/preview/emoji-preview.gif" width="128" height="128" alt="Emoji Preview">
 
 Display an animated emoji on the iDot display.
 
@@ -138,25 +138,23 @@ Aliases: `+1` for thumbsup, `-1` for thumbsdown, `lol` for rofl
 
 Emoji animations from [Noto Emoji Animation](https://googlefonts.github.io/noto-emoji-animation/) by Google.
 
-### emoji-slideshow
+### demo
 
-Display all emojis in a slideshow, cycling through each one.
+Showcase all display features in a continuous slideshow (random order).
 
 ```bash
-./idm-cli emoji-slideshow
-./idm-cli emoji-slideshow --interval 5
+./idm-cli demo
 ```
 
 Options:
 - `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
-- `--interval`: Seconds to display each emoji (default: 3)
 - `--verbose`: Enable verbose debug logging
 
-The slideshow loops forever until interrupted with Ctrl+C.
+The demo loops forever until interrupted with Ctrl+C.
 
 ### grot
 
-<img src="docs/assets/grot-preview.gif" width="128" height="128" alt="Grot Preview">
+<img src="pkg/assets/preview/grot-preview.gif" width="128" height="128" alt="Grot Preview">
 
 Display a Halloween-themed animation on the iDot display.
 

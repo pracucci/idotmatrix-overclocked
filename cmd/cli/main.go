@@ -21,7 +21,7 @@ func main() {
 func init() {
 	rootCmd.AddCommand(DiscoverCmd)
 	rootCmd.AddCommand(EmojiCmd)
-	rootCmd.AddCommand(EmojiSlideshowCmd)
+	rootCmd.AddCommand(DemoCmd)
 	rootCmd.AddCommand(FireCmd)
 	rootCmd.AddCommand(ClockCmd)
 	rootCmd.AddCommand(GrotCmd)

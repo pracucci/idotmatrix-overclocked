@@ -8,16 +8,13 @@ package emoji
 
 import (
 	"bytes"
-	"embed"
 	"fmt"
 	"image/gif"
 	"strings"
 
+	"github.com/pracucci/idotmatrix-overclocked/pkg/assets"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/graphic"
 )
-
-//go:embed assets/*.gif
-var assets embed.FS
 
 // Emoji defines an emoji with its aliases and asset filename.
 type Emoji struct {
@@ -87,7 +84,7 @@ func Generate(name string) (*graphic.Image, error) {
 		return nil, fmt.Errorf("unknown emoji: %s (available: %s)", name, strings.Join(Names(), ", "))
 	}
 
-	data, err := assets.ReadFile("assets/" + emoji.Filename)
+	data, err := assets.Emoji.ReadFile("emoji/" + emoji.Filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read emoji asset: %w", err)
 	}

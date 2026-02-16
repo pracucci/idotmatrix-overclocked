@@ -5,16 +5,13 @@ package grot
 
 import (
 	"bytes"
-	"embed"
 	"fmt"
 	"image/gif"
 	"strings"
 
+	"github.com/pracucci/idotmatrix-overclocked/pkg/assets"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/graphic"
 )
-
-//go:embed assets/*.gif
-var assets embed.FS
 
 // Grot defines a grot with its aliases and asset filename.
 type Grot struct {
@@ -70,7 +67,7 @@ func Generate(name string) (*graphic.Image, error) {
 		return nil, fmt.Errorf("unknown grot: %s (available: %s)", name, strings.Join(Names(), ", "))
 	}
 
-	data, err := assets.ReadFile("assets/" + g.Filename)
+	data, err := assets.Grot.ReadFile("grot/" + g.Filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read grot asset: %w", err)
 	}
