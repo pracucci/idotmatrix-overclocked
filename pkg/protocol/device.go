@@ -47,7 +47,7 @@ func NewDevice(logger log.Logger) *Device {
 // If targetAddr is empty, it auto-discovers the first device with name prefix "IDM-".
 // If targetAddr is specified, it connects to that specific MAC address.
 func (d *Device) Connect(targetAddr string) error {
-	if err := btAdapter.Enable(); err != nil {
+	if err := btAdapter.Enable(); err != nil && err.Error() != "already calling Enable function" {
 		return err
 	}
 
