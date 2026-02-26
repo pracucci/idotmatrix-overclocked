@@ -14,7 +14,6 @@ import (
 
 var (
 	snakeTargetAddr string
-	snakeStartLevel int
 	snakeVerbose    bool
 )
 
@@ -31,7 +30,6 @@ var SnakeCmd = &cobra.Command{
 
 func init() {
 	SnakeCmd.Flags().StringVar(&snakeTargetAddr, "target", "", "Target iDot display MAC address (auto-discovers if not specified)")
-	SnakeCmd.Flags().IntVar(&snakeStartLevel, "level", 1, "Starting level (default: 1)")
 	SnakeCmd.Flags().BoolVar(&snakeVerbose, "verbose", false, "Enable verbose debug logging")
 }
 
@@ -46,6 +44,6 @@ func runSnake(logger log.Logger) error {
 		}
 	}()
 
-	game := snake.NewGame(device, snakeStartLevel)
+	game := snake.NewGame(device, 1)
 	return game.Run()
 }

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"image/gif"
 	"math/rand"
 	"time"
 
@@ -19,8 +21,10 @@ import (
 )
 
 var (
-	demoTargetAddr string
-	demoVerbose    bool
+	demoTargetAddr  string
+	demoVerbose     bool
+	demoMirrored    bool
+	demoBrightness  int
 )
 
 var DemoCmd = &cobra.Command{
@@ -45,6 +49,8 @@ Examples:
 func init() {
 	DemoCmd.Flags().StringVar(&demoTargetAddr, "target", "", "Target iDot display MAC address (auto-discovers if not specified)")
 	DemoCmd.Flags().BoolVar(&demoVerbose, "verbose", false, "Enable verbose debug logging")
+	DemoCmd.Flags().BoolVar(&demoMirrored, "mirrored", false, "Mirror all images horizontally")
+	DemoCmd.Flags().IntVar(&demoBrightness, "brightness", 100, "Brightness level (0-100)")
 }
 
 // demoItem represents one item in the demo sequence
@@ -98,6 +104,12 @@ func doDemo(logger log.Logger) error {
 				continue
 			}
 
+			gifBytes, err = transformGIFBytes(gifBytes, demoMirrored, demoBrightness)
+			if err != nil {
+				level.Error(logger).Log("msg", "Failed to transform GIF", "name", item.name, "err", err)
+				continue
+			}
+
 			if err := protocol.SendGIF(device, gifBytes, logger); err != nil {
 				level.Error(logger).Log("msg", "Failed to send GIF", "name", item.name, "err", err)
 				continue
@@ -145,4 +157,20 @@ func generateTextGIF(msg, animation string, color graphic.Color) func() ([]byte,
 		}
 		return img.GIFBytes()
 	}
+}
+
+func transformGIFBytes(data []byte, mirror bool, brightness int) ([]byte, error) {
+	g, err := gif.DecodeAll(bytes.NewReader(data))
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode GIF: %w", err)
+	}
+	if mirror {
+		g = graphic.MirrorGIFHorizontal(g)
+	}
+	g = graphic.AdjustBrightnessGIF(g, brightness)
+	var buf bytes.Buffer
+	if err := gif.EncodeAll(&buf, g); err != nil {
+		return nil, fmt.Errorf("failed to re-encode GIF: %w", err)
+	}
+	return buf.Bytes(), nil
 }

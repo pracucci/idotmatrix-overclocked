@@ -33,6 +33,7 @@ See `docs/structure.md` for detailed documentation including:
 | `idot/` | BLE device abstraction (connection, packet writing) |
 | `pkg/protocol/` | iDotMatrix communication protocol (packet construction) |
 | `pkg/text/` | Text rendering, fonts, animations |
+| `pkg/server/` | HTTP server with API and web console |
 | `cmd/` | CLI commands (Cobra framework) |
 
 ## Development Guidelines
@@ -63,6 +64,57 @@ When modifying `pkg/img` or `pkg/text`, ensure existing tests pass and add tests
 2. Document packet structure in code comments
 3. Follow existing patterns for chunking and BLE writes
 4. Use the `DeviceConnection` interface for device abstraction
+
+### Adding API Endpoints
+
+When adding a new display command that should be accessible via the HTTP server:
+
+1. Add the endpoint handler in `pkg/server/api.go`:
+   - Register the route in `registerAPIRoutes()`
+   - Create a handler method on `*Server` (e.g., `handleNewCommand`)
+   - Use `s.withDevice()` to serialize device access
+   - Return JSON via `writeJSON(w, apiResponse{...})`
+
+2. Add the UI in `pkg/server/assets/`:
+   - Add form fields/card in `index.html`
+   - Add action handler in `app.js` `handleAction()` switch
+   - Style as needed in `style.css`
+
+3. API endpoint conventions:
+   - Base path: `/api/`
+   - Methods: POST for actions, GET for status
+   - Query parameters for simple inputs
+   - Multipart form for file uploads
+   - Response format: `{"success": true}` or `{"success": false, "error": "message"}`
+
+Example endpoint handler:
+```go
+func (s *Server) handleNewCommand(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        writeJSON(w, apiResponse{Success: false, Error: "method not allowed"})
+        return
+    }
+
+    param := r.URL.Query().Get("param")
+    if param == "" {
+        writeJSON(w, apiResponse{Success: false, Error: "param required"})
+        return
+    }
+
+    err := s.withDevice(func(d *protocol.Device) error {
+        // ... send to device ...
+        time.Sleep(500 * time.Millisecond)
+        return nil
+    })
+
+    if err != nil {
+        writeJSON(w, apiResponse{Success: false, Error: err.Error()})
+        return
+    }
+
+    writeJSON(w, apiResponse{Success: true})
+}
+```
 
 ### Text/Image Generation
 
@@ -131,6 +183,7 @@ When making changes, update these files as needed:
 | New constants | Relevant package file, `docs/structure.md` |
 | New types | Relevant package file, `docs/structure.md` |
 | CLI command added/removed/modified | `README.md` (CLI Commands section) |
+| New API endpoint | `pkg/server/api.go`, `pkg/server/assets/*`, `docs/structure.md` |
 
 ## Preview GIF Regeneration
 

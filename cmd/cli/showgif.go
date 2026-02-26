@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
+	"github.com/pracucci/idotmatrix-overclocked/pkg/graphic"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/logging"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/protocol"
 	"github.com/spf13/cobra"
@@ -27,6 +28,8 @@ const (
 var showgifTargetAddr string
 var showgifGifFile string
 var showgifVerbose bool
+var showgifMirrored bool
+var showgifBrightness int
 
 var ShowgifCmd = &cobra.Command{
 	Use:   "showgif",
@@ -46,6 +49,8 @@ func init() {
 	ShowgifCmd.MarkFlagRequired("gif-file")
 
 	ShowgifCmd.Flags().BoolVar(&showgifVerbose, "verbose", false, "Enable verbose debug logging")
+	ShowgifCmd.Flags().BoolVar(&showgifMirrored, "mirrored", false, "Mirror the image horizontally")
+	ShowgifCmd.Flags().IntVar(&showgifBrightness, "brightness", 100, "Brightness level (0-100)")
 }
 
 // loadAndReencodeGIF loads a GIF, re-composites frames, and re-encodes it for the device.
@@ -145,6 +150,20 @@ func doShowGIF(logger log.Logger) error {
 	if err != nil {
 		return err
 	}
+
+	g, err := gif.DecodeAll(bytes.NewReader(gifData))
+	if err != nil {
+		return fmt.Errorf("failed to decode GIF: %w", err)
+	}
+	if showgifMirrored {
+		g = graphic.MirrorGIFHorizontal(g)
+	}
+	g = graphic.AdjustBrightnessGIF(g, showgifBrightness)
+	var buf bytes.Buffer
+	if err := gif.EncodeAll(&buf, g); err != nil {
+		return fmt.Errorf("failed to re-encode GIF: %w", err)
+	}
+	gifData = buf.Bytes()
 
 	device := protocol.NewDevice(logger)
 	if err = device.Connect(showgifTargetAddr); err != nil {

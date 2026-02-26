@@ -27,6 +27,7 @@ func init() {
 	rootCmd.AddCommand(GrotCmd)
 	rootCmd.AddCommand(OffCmd)
 	rootCmd.AddCommand(OnCmd)
+	rootCmd.AddCommand(ServerCmd)
 	rootCmd.AddCommand(ShowgifCmd)
 	rootCmd.AddCommand(ShowimageCmd)
 	rootCmd.AddCommand(TextCmd)

@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
+	"github.com/pracucci/idotmatrix-overclocked/pkg/graphic"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/logging"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/protocol"
 	"github.com/spf13/cobra"
@@ -20,6 +21,8 @@ var showimageTargetAddr string
 var showimageImageFile string
 var showimageDisplaySize int
 var showimageVerbose bool
+var showimageMirrored bool
+var showimageBrightness int
 
 var ShowimageCmd = &cobra.Command{
 	Use:   "showimage",
@@ -40,6 +43,8 @@ func init() {
 
 	ShowimageCmd.Flags().IntVar(&showimageDisplaySize, "size", 64, "Display size (32 or 64)")
 	ShowimageCmd.Flags().BoolVar(&showimageVerbose, "verbose", false, "Enable verbose debug logging")
+	ShowimageCmd.Flags().BoolVar(&showimageMirrored, "mirrored", false, "Mirror the image horizontally")
+	ShowimageCmd.Flags().IntVar(&showimageBrightness, "brightness", 100, "Brightness level (0-100)")
 }
 
 // loadAndConvertImage loads an image file and converts it to raw RGB data
@@ -92,6 +97,12 @@ func doShowImage(logger log.Logger) error {
 	if err != nil {
 		return err
 	}
+
+	if showimageMirrored {
+		rgbData = graphic.MirrorBufferHorizontal(rgbData)
+	}
+
+	rgbData = graphic.AdjustBrightnessBuffer(rgbData, showimageBrightness)
 
 	device := protocol.NewDevice(logger)
 	if err = device.Connect(showimageTargetAddr); err != nil {

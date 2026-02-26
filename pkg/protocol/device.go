@@ -48,7 +48,10 @@ func NewDevice(logger log.Logger) *Device {
 // If targetAddr is specified, it connects to that specific MAC address.
 func (d *Device) Connect(targetAddr string) error {
 	if err := btAdapter.Enable(); err != nil {
-		return err
+		// Ignore "already enabled" errors during reconnection
+		if !strings.Contains(err.Error(), "already") {
+			return err
+		}
 	}
 
 	// Scan for device
@@ -150,6 +153,9 @@ func (d *Device) Connect(targetAddr string) error {
 
 // Disconnect closes the BLE connection to the device.
 func (d *Device) Disconnect() error {
+	if d.btDevice == nil {
+		return nil
+	}
 	return d.btDevice.Disconnect()
 }
 

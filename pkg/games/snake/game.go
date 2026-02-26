@@ -3,10 +3,7 @@ package snake
 import (
 	"fmt"
 	"math/rand"
-	"os"
 	"time"
-
-	"golang.org/x/term"
 
 	"github.com/pracucci/idotmatrix-overclocked/pkg/protocol"
 )
@@ -19,6 +16,16 @@ const (
 	Down
 	Left
 	Right
+)
+
+// GameState represents the current state of the game.
+type GameState string
+
+const (
+	StateCover    GameState = "cover"
+	StatePlaying  GameState = "playing"
+	StateGameOver GameState = "gameover"
+	StateEnded    GameState = "ended"
 )
 
 // PixelChange represents a pixel update to be sent to the device.
@@ -36,16 +43,17 @@ type Game struct {
 	score       int
 	running     bool
 	gameOver    bool
-	inputChan   chan rune
+	state       GameState
+	input       InputSource
 	background  []byte // Store background RGB data for pixel restoration
 
 	// Level system
 	startLevel   int         // Starting level (for testing)
 	currentLevel int         // Current level (1-based)
 	applesEaten  int         // Apples eaten in current level
-	gameMap     *Map    // Current map with obstacles
-	levelConfig LevelConfig // Current level configuration
-	growthQueue int         // Pending growth segments
+	gameMap      *Map        // Current map with obstacles
+	levelConfig  LevelConfig // Current level configuration
+	growthQueue  int         // Pending growth segments
 }
 
 // NewGame creates a new snake game instance.
@@ -56,11 +64,64 @@ func NewGame(device protocol.DeviceConnection, startLevel int) *Game {
 	g := &Game{
 		device:       device,
 		running:      true,
-		inputChan:    make(chan rune, 10),
+		state:        StateCover,
 		startLevel:   startLevel,
 		currentLevel: startLevel,
 	}
 	return g
+}
+
+// GetState returns the current game state.
+func (g *Game) GetState() GameState {
+	return g.state
+}
+
+// GetScore returns the current score.
+func (g *Game) GetScore() int {
+	return g.score
+}
+
+// GetLevel returns the current level.
+func (g *Game) GetLevel() int {
+	return g.currentLevel
+}
+
+// IsRunning returns whether the game is still running.
+func (g *Game) IsRunning() bool {
+	return g.running
+}
+
+// Stop stops the game.
+func (g *Game) Stop() {
+	g.running = false
+	g.state = StateEnded
+}
+
+// SendInput sends a key input to the game.
+func (g *Game) SendInput(key string) {
+	if g.input == nil {
+		return
+	}
+
+	channelInput, ok := g.input.(*ChannelInput)
+	if !ok {
+		return
+	}
+
+	switch key {
+	case "up":
+		channelInput.SendKey('w')
+	case "down":
+		channelInput.SendKey('s')
+	case "left":
+		channelInput.SendKey('a')
+	case "right":
+		channelInput.SendKey('d')
+	case "quit":
+		channelInput.SendKey('q')
+	case "restart":
+		channelInput.SendKey('r')
+	}
 }
 
 // reset initializes the game state for a new game.
@@ -229,29 +290,34 @@ func (g *Game) move() ([]PixelChange, bool) {
 
 // handleInput processes keyboard input.
 func (g *Game) handleInput() {
-	select {
-	case key := <-g.inputChan:
-		switch key {
-		case 'w', 'W':
-			if g.direction != Down {
-				g.direction = Up
-			}
-		case 's', 'S':
-			if g.direction != Up {
-				g.direction = Down
-			}
-		case 'a', 'A':
-			if g.direction != Right {
-				g.direction = Left
-			}
-		case 'd', 'D':
-			if g.direction != Left {
-				g.direction = Right
-			}
-		case 'q', 'Q':
-			g.running = false
+	if g.input == nil {
+		return
+	}
+
+	key, ok := g.input.TryReadKey()
+	if !ok {
+		return
+	}
+
+	switch key {
+	case 'w', 'W':
+		if g.direction != Down {
+			g.direction = Up
 		}
-	default:
+	case 's', 'S':
+		if g.direction != Up {
+			g.direction = Down
+		}
+	case 'a', 'A':
+		if g.direction != Right {
+			g.direction = Left
+		}
+	case 'd', 'D':
+		if g.direction != Left {
+			g.direction = Right
+		}
+	case 'q', 'Q':
+		g.running = false
 	}
 }
 
@@ -281,47 +347,10 @@ func (g *Game) showImage(rgbData []byte) error {
 
 // waitForKey blocks until a key is pressed.
 func (g *Game) waitForKey() rune {
-	return <-g.inputChan
-}
-
-// startInputReader starts the keyboard input goroutine.
-func (g *Game) startInputReader() func() {
-	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
-	if err != nil {
-		fmt.Printf("Warning: could not set raw mode: %v\n", err)
-		return func() {}
+	if g.input == nil {
+		return 'q'
 	}
-
-	go func() {
-		buf := make([]byte, 3)
-		for g.running {
-			n, err := os.Stdin.Read(buf)
-			if err != nil {
-				return
-			}
-			if n > 0 {
-				// Handle escape sequences for arrow keys
-				if n == 3 && buf[0] == 27 && buf[1] == 91 {
-					switch buf[2] {
-					case 65: // up arrow
-						g.inputChan <- 'w'
-					case 66: // down arrow
-						g.inputChan <- 's'
-					case 67: // right arrow
-						g.inputChan <- 'd'
-					case 68: // left arrow
-						g.inputChan <- 'a'
-					}
-				} else {
-					g.inputChan <- rune(buf[0])
-				}
-			}
-		}
-	}()
-
-	return func() {
-		term.Restore(int(os.Stdin.Fd()), oldState)
-	}
+	return g.input.ReadKey()
 }
 
 // runLevel runs a single level and returns true if the game should continue.
@@ -374,28 +403,44 @@ func (g *Game) runLevel() (continueGame bool, advanceLevel bool) {
 	return true, false // Game over, don't advance
 }
 
-// Run starts the main game loop.
+// Run starts the main game loop using terminal input.
 func (g *Game) Run() error {
 	fmt.Println("Starting Snake!")
 	fmt.Println("Controls: WASD or Arrow keys to move, Q to quit, R to restart")
 
-	cleanup := g.startInputReader()
-	defer cleanup()
+	input, err := NewTerminalInput()
+	if err != nil {
+		fmt.Printf("Warning: could not set raw mode: %v\n", err)
+		return err
+	}
+	defer input.Close()
 
+	g.input = input
+	return g.runWithInput()
+}
+
+// RunWithChannelInput starts the game loop with a channel-based input source (for HTTP).
+func (g *Game) RunWithChannelInput(input *ChannelInput) error {
+	g.input = input
+	return g.runWithInput()
+}
+
+// runWithInput runs the game loop with the current input source.
+func (g *Game) runWithInput() error {
 	for g.running {
 		// Show cover image and wait for key to start
+		g.state = StateCover
 		if err := g.showImage(GenerateCoverImage()); err != nil {
 			return err
 		}
-		fmt.Print("Press any key to start...")
 		key := g.waitForKey()
-		fmt.Println() // Move to next line after key press
 		if key == 'q' || key == 'Q' {
 			break
 		}
 
 		// Reset and start game
 		g.reset()
+		g.state = StatePlaying
 
 		// Level loop
 		for g.running && !g.gameOver {
@@ -413,6 +458,7 @@ func (g *Game) Run() error {
 		}
 
 		// Game over - show game over image and wait for any key to restart (Q to quit)
+		g.state = StateGameOver
 		if err := g.showImage(GenerateGameOverImage()); err != nil {
 			return err
 		}
@@ -422,5 +468,7 @@ func (g *Game) Run() error {
 		}
 	}
 
+	g.running = false
+	g.state = StateEnded
 	return nil
 }

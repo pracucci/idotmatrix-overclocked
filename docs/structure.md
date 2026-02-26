@@ -27,6 +27,7 @@ idm-cli/
 │       ├── discover.go        # Bluetooth device scanner
 │       ├── fire.go            # DOOM-style fire animation
 │       ├── clock.go           # Digital clock display
+│       ├── server.go          # HTTP server command
 │       ├── showgif.go         # GIF file display
 │       ├── showimage.go       # Static image display
 │       ├── text.go            # Text rendering with animations
@@ -55,6 +56,14 @@ idm-cli/
 │   ├── level.go               # Level definitions
 │   ├── map.go                 # Game map
 │   └── render.go              # Game rendering
+├── pkg/server/                # HTTP server for web control
+│   ├── server.go              # Server struct, device management, graceful shutdown
+│   ├── api.go                 # API endpoint handlers (/api/*)
+│   ├── console.go             # Web console static file serving
+│   └── assets/                # Embedded web console assets
+│       ├── index.html         # Main HTML page
+│       ├── style.css          # Dark theme styles
+│       └── app.js             # UI logic, API calls, preview canvas
 ├── testdata/                  # Test assets
 │   ├── demo.gif
 │   ├── test_64x64.gif
@@ -120,6 +129,18 @@ Cobra-based CLI providing end-user functionality.
 | `clock` | Configure and display digital clock |
 | `fire` | Generate DOOM-style fire animation |
 | `snake` | Interactive snake game |
+| `server` | HTTP server with API and web console |
+
+### `pkg/server/` - HTTP Server
+
+Web-based control interface for the iDotMatrix display.
+
+| File | Purpose |
+|------|---------|
+| `server.go` | Server struct, device connection management, HTTP setup, graceful shutdown |
+| `api.go` | API endpoint handlers for all display commands |
+| `console.go` | Serves embedded static files for web console |
+| `assets/*` | HTML, CSS, JS for web console UI |
 
 ---
 

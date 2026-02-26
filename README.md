@@ -10,6 +10,33 @@
 make build
 ```
 
+## Modes
+
+The tool supports two modes of operation:
+
+### CLI Mode
+
+Run commands directly from the terminal:
+
+```bash
+./idm-cli text --text "HELLO" --color red
+./idm-cli emoji --name rocket
+./idm-cli fire
+```
+
+### Web Console Mode
+
+Start a web server with a graphical interface:
+
+```bash
+./idm-cli server --port 3010
+```
+
+Then open http://localhost:3010 in your browser. The web console provides:
+- Live preview of what will be displayed on the device
+- Controls for text, emoji, animations, clock, and more
+- File upload for custom images and GIFs
+
 ## Auto-Discovery
 
 All commands support automatic device discovery. If `--target` is not specified, the tool will scan for nearby iDotMatrix devices (names starting with "IDM-") and connect to the first one found (sorted alphabetically).
@@ -28,7 +55,6 @@ Play Snake on the iDot display with progressive difficulty levels.
 
 Options:
 - `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
-- `--level`: Starting level (default: 1)
 
 Controls: WASD or Arrow keys to move, Q to quit
 

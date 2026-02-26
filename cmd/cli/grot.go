@@ -14,9 +14,11 @@ import (
 )
 
 var (
-	grotTargetAddr string
-	grotName       string
-	grotVerbose    bool
+	grotTargetAddr  string
+	grotName        string
+	grotVerbose     bool
+	grotMirrored    bool
+	grotBrightness  int
 )
 
 var GrotCmd = &cobra.Command{
@@ -47,6 +49,8 @@ func init() {
 	GrotCmd.MarkFlagRequired("name")
 
 	GrotCmd.Flags().BoolVar(&grotVerbose, "verbose", false, "Enable verbose debug logging")
+	GrotCmd.Flags().BoolVar(&grotMirrored, "mirrored", false, "Mirror the image horizontally")
+	GrotCmd.Flags().IntVar(&grotBrightness, "brightness", 100, "Brightness level (0-100)")
 }
 
 func doGrot(logger log.Logger) error {
@@ -59,6 +63,12 @@ func doGrot(logger log.Logger) error {
 	if err != nil {
 		return err
 	}
+
+	if grotMirrored {
+		image = image.Mirror()
+	}
+
+	image = image.AdjustBrightness(grotBrightness)
 
 	// Connect to device
 	device := protocol.NewDevice(logger)

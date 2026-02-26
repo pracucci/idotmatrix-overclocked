@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iDotMatrix Console</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="buttons.css">
+</head>
+<body>
+    <header>
+        <h1>iDotMatrix Console</h1>
+        <div class="header-controls">
+            <span id="status" class="status">Checking...</span>
+            <div class="checkbox-group header-checkbox">
+                <input type="checkbox" id="mirrored-checkbox">
+                <label for="mirrored-checkbox">Mirror</label>
+            </div>
+            <div class="slider-group header-slider">
+                <label for="brightness-slider">Brightness</label>
+                <input type="range" id="brightness-slider" min="0" max="100" value="100">
+                <span id="brightness-value">100</span>
+            </div>
+            <div class="power-buttons">
+                <button id="btn-power-on" class="btn btn-small">ON</button>
+                <button id="btn-power-off" class="btn btn-small btn-secondary">OFF</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <aside class="preview-panel">
+            <h2>Preview</h2>
+            <div class="preview-container">
+                <img id="preview" width="256" height="256" alt="Preview">
+            </div>
+            <p class="preview-hint">64x64 display preview (4x scale)</p>
+        </aside>
+
+        <section class="controls-panel">
+            <nav class="tabs">
+                <button class="tab active" data-tab="display">Display</button>
+                <button class="tab" data-tab="games">Games</button>
+            </nav>
+
+            <div id="tab-display" class="tab-content active">
+                <div class="cards-grid">
+                    <!-- Text Card -->
+                    <div class="card">
+                        <h3>Text</h3>
+                        <div class="form-group">
+                            <label for="text-input">Message</label>
+                            <input type="text" id="text-input" placeholder="HELLO WORLD" maxlength="100">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="text-animation">Animation</label>
+                                <select id="text-animation">
+                                    <option value="none">None</option>
+                                    <option value="blink">Blink</option>
+                                    <option value="appear">Appear</option>
+                                    <option value="appear-disappear">Appear-Disappear</option>
+                                    <option value="fireworks">Fireworks</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="text-color">Color</label>
+                                <select id="text-color">
+                                    <option value="white">White</option>
+                                    <option value="red">Red</option>
+                                    <option value="green">Green</option>
+                                    <option value="blue">Blue</option>
+                                    <option value="yellow">Yellow</option>
+                                    <option value="cyan">Cyan</option>
+                                    <option value="magenta">Magenta</option>
+                                    <option value="orange">Orange</option>
+                                    <option value="purple">Purple</option>
+                                    <option value="pink">Pink</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn" data-action="text">Send Text</button>
+                    </div>
+
+                    <!-- Emoji Card -->
+                    <div class="card">
+                        <h3>Emoji</h3>
+                        <div class="form-group">
+                            <label for="emoji-name">Emoji</label>
+                            <select id="emoji-name">
+                                <option value="thumbsup">Thumbs Up</option>
+                                <option value="thumbsdown">Thumbs Down</option>
+                                <option value="hearthands">Heart Hands</option>
+                                <option value="clap">Clap</option>
+                                <option value="joy">Joy</option>
+                                <option value="rofl">ROFL</option>
+                                <option value="party">Party</option>
+                                <option value="scream">Scream</option>
+                                <option value="rage">Rage</option>
+                                <option value="scared">Scared</option>
+                                <option value="mindblow">Mind Blown</option>
+                                <option value="coldface">Cold Face</option>
+                                <option value="hotface">Hot Face</option>
+                                <option value="robot">Robot</option>
+                                <option value="sparkles">Sparkles</option>
+                                <option value="tada">Tada</option>
+                                <option value="100">100</option>
+                                <option value="confetti">Confetti</option>
+                                <option value="risinghands">Rising Hands</option>
+                                <option value="rocket">Rocket</option>
+                                <option value="birthday">Birthday</option>
+                            </select>
+                        </div>
+                        <button class="btn" data-action="emoji">Show Emoji</button>
+                    </div>
+
+                    <!-- Grot Card -->
+                    <div class="card">
+                        <h3>Grot Animation</h3>
+                        <div class="form-group">
+                            <label for="grot-name">Animation</label>
+                            <select id="grot-name">
+                                <option value="halloween-1">Halloween 1</option>
+                                <option value="halloween-2">Halloween 2</option>
+                                <option value="halloween-3">Halloween 3</option>
+                                <option value="halloween-4">Halloween 4</option>
+                                <option value="halloween-5">Halloween 5</option>
+                                <option value="halloween-6">Halloween 6</option>
+                                <option value="halloween-7">Halloween 7</option>
+                                <option value="matrix">Matrix</option>
+                            </select>
+                        </div>
+                        <button class="btn" data-action="grot">Show Animation</button>
+                    </div>
+
+                    <!-- Fire Card -->
+                    <div class="card">
+                        <h3>Fire</h3>
+                        <p class="card-description">DOOM-style fire animation</p>
+                        <button class="btn" data-action="fire">Show Fire</button>
+                    </div>
+
+                    <!-- Clock Card -->
+                    <div class="card">
+                        <h3>Clock</h3>
+                        <div class="form-group">
+                            <label for="clock-style">Style</label>
+                            <select id="clock-style">
+                                <option value="0">Default</option>
+                                <option value="1">Christmas</option>
+                                <option value="2">Racing</option>
+                                <option value="3">Inverted</option>
+                                <option value="4" selected>Hourglass</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="clock-show-date" checked>
+                                <label for="clock-show-date">Show Date</label>
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="clock-24h" checked>
+                                <label for="clock-24h">24-Hour</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clock-color">Color</label>
+                            <select id="clock-color">
+                                <option value="white">White</option>
+                                <option value="red">Red</option>
+                                <option value="green">Green</option>
+                                <option value="blue">Blue</option>
+                                <option value="yellow">Yellow</option>
+                                <option value="cyan">Cyan</option>
+                                <option value="magenta">Magenta</option>
+                                <option value="orange">Orange</option>
+                                <option value="purple">Purple</option>
+                                <option value="pink">Pink</option>
+                            </select>
+                        </div>
+                        <button class="btn" data-action="clock">Set Clock</button>
+                    </div>
+
+                    <!-- Image Upload Card -->
+                    <div class="card">
+                        <h3>Static Image</h3>
+                        <div class="form-group">
+                            <label>Upload 64x64 Image</label>
+                            <div class="drop-zone" id="image-drop-zone">
+                                <p>Drop image here or click to browse</p>
+                                <input type="file" id="image-file" accept="image/png,image/jpeg,image/gif" hidden>
+                            </div>
+                            <div id="image-preview-container" class="file-preview" hidden>
+                                <img id="image-preview" alt="Preview">
+                                <span id="image-filename"></span>
+                            </div>
+                        </div>
+                        <button class="btn" data-action="showimage" disabled id="btn-showimage">Upload Image</button>
+                    </div>
+
+                    <!-- GIF Upload Card -->
+                    <div class="card">
+                        <h3>Animated GIF</h3>
+                        <div class="form-group">
+                            <label>Upload 64x64 GIF</label>
+                            <div class="drop-zone" id="gif-drop-zone">
+                                <p>Drop GIF here or click to browse</p>
+                                <input type="file" id="gif-file" accept="image/gif" hidden>
+                            </div>
+                            <div id="gif-preview-container" class="file-preview" hidden>
+                                <img id="gif-preview" alt="Preview">
+                                <span id="gif-filename"></span>
+                            </div>
+                        </div>
+                        <button class="btn" data-action="showgif" disabled id="btn-showgif">Upload GIF</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-games" class="tab-content">
+                <div class="cards-grid">
+                    <!-- Snake Card -->
+                    <div class="card" id="snake-card">
+                        <h3>Snake</h3>
+                        <div class="button-row">
+                            <button class="btn" id="btn-snake-start">Start Game</button>
+                            <button class="btn btn-secondary" id="btn-snake-stop" disabled>Stop Game</button>
+                        </div>
+                        <p class="card-hint" id="snake-hint">Click Start Game to begin</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="notifications" class="notifications"></div>
+    <script src="app.js"></script>
+</body>
+</html>

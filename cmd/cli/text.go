@@ -15,11 +15,13 @@ import (
 )
 
 var (
-	textTargetAddr string
-	textMsg        string
-	textAnimation  string
-	textColorName  string
-	textVerbose    bool
+	textTargetAddr  string
+	textMsg         string
+	textAnimation   string
+	textColorName   string
+	textVerbose     bool
+	textMirrored    bool
+	textBrightness  int
 )
 
 // animationTypesHelp returns a formatted help string for all animation types.
@@ -73,6 +75,8 @@ func init() {
 	TextCmd.Flags().StringVar(&textAnimation, "animation", "none", "Animation type: "+text.AnimationTypeNamesString())
 	TextCmd.Flags().StringVar(&textColorName, "color", "white", fmt.Sprintf("Text color (%s)", strings.Join(graphic.ColorNames(), ", ")))
 	TextCmd.Flags().BoolVar(&textVerbose, "verbose", false, "Enable verbose debug logging")
+	TextCmd.Flags().BoolVar(&textMirrored, "mirrored", false, "Mirror the image horizontally")
+	TextCmd.Flags().IntVar(&textBrightness, "brightness", 100, "Brightness level (0-100)")
 }
 
 func doShowText(logger log.Logger) error {
@@ -106,6 +110,12 @@ func doShowText(logger log.Logger) error {
 	if errMsg != "" {
 		return fmt.Errorf("%s", errMsg)
 	}
+
+	if textMirrored {
+		image = image.Mirror()
+	}
+
+	image = image.AdjustBrightness(textBrightness)
 
 	// Connect to device
 	device := protocol.NewDevice(logger)

@@ -14,9 +14,11 @@ import (
 )
 
 var (
-	emojiTargetAddr string
-	emojiName       string
-	emojiVerbose    bool
+	emojiTargetAddr  string
+	emojiName        string
+	emojiVerbose     bool
+	emojiMirrored    bool
+	emojiBrightness  int
 )
 
 var EmojiCmd = &cobra.Command{
@@ -48,6 +50,8 @@ func init() {
 	EmojiCmd.MarkFlagRequired("name")
 
 	EmojiCmd.Flags().BoolVar(&emojiVerbose, "verbose", false, "Enable verbose debug logging")
+	EmojiCmd.Flags().BoolVar(&emojiMirrored, "mirrored", false, "Mirror the image horizontally")
+	EmojiCmd.Flags().IntVar(&emojiBrightness, "brightness", 100, "Brightness level (0-100)")
 }
 
 func doEmoji(logger log.Logger) error {
@@ -60,6 +64,12 @@ func doEmoji(logger log.Logger) error {
 	if err != nil {
 		return err
 	}
+
+	if emojiMirrored {
+		image = image.Mirror()
+	}
+
+	image = image.AdjustBrightness(emojiBrightness)
 
 	// Connect to device
 	device := protocol.NewDevice(logger)
