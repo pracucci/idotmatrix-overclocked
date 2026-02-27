@@ -32,6 +32,22 @@ Options:
 
 Controls: WASD or Arrow keys to move, Q to quit
 
+### tetris
+
+<img src="pkg/assets/preview/tetris-preview.gif" width="128" height="128" alt="Tetris Preview">
+
+Play Tetris on the iDot display.
+
+```bash
+./idm-cli tetris
+```
+
+Options:
+- `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
+- `--verbose`: Enable verbose debug logging
+
+Controls: A/Left=Move left, D/Right=Move right, W/Up=Rotate, S/Down=Soft drop, Space=Hard drop, Q=Quit
+
 ### text
 
 <img src="pkg/assets/preview/text-preview.gif" width="128" height="128" alt="Text Preview">

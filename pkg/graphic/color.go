@@ -15,7 +15,9 @@ var (
 	Magenta = Color{255, 0, 255}
 	Orange  = Color{255, 150, 0}
 	Gray    = Color{128, 128, 128}
+	DimGray = Color{80, 80, 80}
 	Purple  = Color{128, 0, 128}
+	Violet  = Color{160, 32, 240}
 	Pink    = Color{255, 105, 180}
 
 	// Shadow colors (darker versions)

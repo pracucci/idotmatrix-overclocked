@@ -30,14 +30,16 @@ idm-cli/
 │       ├── showgif.go         # GIF file display
 │       ├── showimage.go       # Static image display
 │       ├── text.go            # Text rendering with animations
-│       └── snake.go           # Snake game
+│       ├── snake.go           # Snake game
+│       └── tetris.go          # Tetris game
 ├── idot/                      # BLE device abstraction
 │   ├── doc.go                 # Package documentation
 │   └── device.go              # BLE connection & communication
 ├── pkg/graphic/               # Graphics utilities (colors, images, buffers)
 │   ├── color.go               # Color type, palette, shadows
 │   ├── image.go               # Image container types, display constants
-│   └── image_test.go          # Tests for image and color functions
+│   ├── image_test.go          # Tests for image and color functions
+│   └── point.go               # Point type for coordinates
 ├── pkg/protocol/              # iDotMatrix communication protocol
 │   ├── device.go              # DeviceConnection interface
 │   ├── clock.go               # Clock display modes
@@ -55,6 +57,7 @@ idm-cli/
 │   ├── level.go               # Level definitions
 │   ├── map.go                 # Game map
 │   └── render.go              # Game rendering
+├── pkg/games/tetris/          # Tetris game implementation
 ├── testdata/                  # Test assets
 │   ├── demo.gif
 │   ├── test_64x64.gif
@@ -94,7 +97,7 @@ Protocol packet construction and encoding for iDot matrix displays.
 | `clock.go` | `SetClockMode()`, `SetTime()`, clock style constants |
 | `image.go` | `SetDrawMode()`, `SendImage()` for RGB data (4096-byte chunks, 9-byte headers) |
 | `gif.go` | `SendGIF()` for animated GIFs (4096-byte chunks, 16-byte headers, CRC32) |
-| `graffiti.go` | `SetPixel()` for individual pixel updates |
+| `graffiti.go` | `SetPixel()`, `SetPixels()` for individual/multi pixel updates |
 
 ### `pkg/text/` - Text Rendering
 
@@ -120,6 +123,7 @@ Cobra-based CLI providing end-user functionality.
 | `clock` | Configure and display digital clock |
 | `fire` | Generate DOOM-style fire animation |
 | `snake` | Interactive snake game |
+| `tetris` | Interactive Tetris game |
 
 ---
 
@@ -137,6 +141,7 @@ Cobra-based CLI providing end-user functionality.
 | Text Layout | `pkg/text/text.go` | `pkg/text/font.go` |
 | Text Animations | `pkg/text/animation.go` | `pkg/text/draw.go` |
 | Character Drawing | `pkg/text/draw.go` | `pkg/text/font.go` |
+| Tetris Game | `pkg/games/tetris/game.go` | `pkg/games/tetris/*.go` |
 
 ---
 
