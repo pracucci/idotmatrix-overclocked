@@ -168,6 +168,34 @@ Options:
 
 The demo loops forever until interrupted with Ctrl+C.
 
+### showimage
+
+Display a static image (PNG, JPEG, or GIF) on the iDot display. Images are automatically resized to fit the display.
+
+```bash
+./idm-cli showimage --image-file photo.png
+./idm-cli showimage --image-file logo.jpg --size 32
+```
+
+Options:
+- `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
+- `--image-file` (required): Path to an image file (PNG, JPEG, GIF)
+- `--size`: Display size, 32 or 64 (default: 64)
+- `--verbose`: Enable verbose debug logging
+
+### showgif
+
+Display an animated GIF on the 64x64 iDot display. GIFs are automatically resized to fit the display.
+
+```bash
+./idm-cli showgif --gif-file animation.gif
+```
+
+Options:
+- `--target`: Bluetooth MAC address of the display (auto-discovers if not specified)
+- `--gif-file` (required): Path to an animated GIF file
+- `--verbose`: Enable verbose debug logging
+
 ### grot
 
 <img src="pkg/assets/preview/grot-preview.gif" width="128" height="128" alt="Grot Preview">

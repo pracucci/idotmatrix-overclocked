@@ -14,6 +14,7 @@ import (
 	"github.com/pracucci/idotmatrix-overclocked/pkg/logging"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/protocol"
 	"github.com/spf13/cobra"
+	xdraw "golang.org/x/image/draw"
 )
 
 var showimageTargetAddr string
@@ -56,20 +57,19 @@ func loadAndConvertImage(filePath string, expectedSize int) ([]byte, error) {
 	}
 
 	bounds := img.Bounds()
-	width := bounds.Max.X - bounds.Min.X
-	height := bounds.Max.Y - bounds.Min.Y
-
-	if width != expectedSize || height != expectedSize {
-		return nil, fmt.Errorf("image is %dx%d, expected %dx%d", width, height, expectedSize, expectedSize)
+	if bounds.Dx() != expectedSize || bounds.Dy() != expectedSize {
+		fmt.Printf("Resizing image from %dx%d to %dx%d\n", bounds.Dx(), bounds.Dy(), expectedSize, expectedSize)
+		dst := image.NewRGBA(image.Rect(0, 0, expectedSize, expectedSize))
+		xdraw.CatmullRom.Scale(dst, dst.Bounds(), img, bounds, xdraw.Over, nil)
+		img = dst
+		bounds = img.Bounds()
 	}
 
-	// Convert to raw RGB data (3 bytes per pixel)
 	rgbData := make([]byte, expectedSize*expectedSize*3)
 	idx := 0
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			r, g, b, _ := img.At(x, y).RGBA()
-			// RGBA returns 16-bit values, convert to 8-bit
 			rgbData[idx] = uint8(r >> 8)
 			rgbData[idx+1] = uint8(g >> 8)
 			rgbData[idx+2] = uint8(b >> 8)

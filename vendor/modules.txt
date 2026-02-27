@@ -65,6 +65,10 @@ github.com/stretchr/testify/require
 # github.com/tinygo-org/cbgo v0.0.4
 ## explicit; go 1.14
 github.com/tinygo-org/cbgo
+# golang.org/x/image v0.36.0
+## explicit; go 1.24.0
+golang.org/x/image/draw
+golang.org/x/image/math/f64
 # golang.org/x/sys v0.41.0
 ## explicit; go 1.24.0
 golang.org/x/sys/plan9

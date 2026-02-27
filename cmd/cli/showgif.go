@@ -15,6 +15,7 @@ import (
 	"github.com/pracucci/idotmatrix-overclocked/pkg/logging"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/protocol"
 	"github.com/spf13/cobra"
+	xdraw "golang.org/x/image/draw"
 )
 
 const (
@@ -61,9 +62,9 @@ func loadAndReencodeGIF(filePath string) ([]byte, error) {
 		return nil, fmt.Errorf("failed to decode GIF: %w", err)
 	}
 
-	// Validate dimensions
-	if g.Config.Width != showgifDisplaySize || g.Config.Height != showgifDisplaySize {
-		return nil, fmt.Errorf("GIF is %dx%d, expected %dx%d", g.Config.Width, g.Config.Height, showgifDisplaySize, showgifDisplaySize)
+	needsResize := g.Config.Width != showgifDisplaySize || g.Config.Height != showgifDisplaySize
+	if needsResize {
+		fmt.Printf("Resizing GIF from %dx%d to %dx%d\n", g.Config.Width, g.Config.Height, showgifDisplaySize, showgifDisplaySize)
 	}
 
 	numFrames := len(g.Image)
@@ -91,23 +92,26 @@ func loadAndReencodeGIF(filePath string) ([]byte, error) {
 		fmt.Printf("Warning: GIF duration %dms exceeds %dms limit\n", totalDurationMs, showgifMaxDurationMs)
 	}
 
-	// Re-composite and re-encode frames
-	canvas := image.NewRGBA(image.Rect(0, 0, showgifDisplaySize, showgifDisplaySize))
+	canvas := image.NewRGBA(image.Rect(0, 0, g.Config.Width, g.Config.Height))
 	newFrames := make([]*image.Paletted, numFrames)
 
 	for i := 0; i < numFrames; i++ {
 		frame := g.Image[i]
 		bounds := frame.Bounds()
 
-		// Composite frame onto canvas
 		draw.Draw(canvas, bounds, frame, bounds.Min, draw.Over)
 
-		// Create new paletted frame from canvas
+		var src image.Image = canvas
+		if needsResize {
+			dst := image.NewRGBA(image.Rect(0, 0, showgifDisplaySize, showgifDisplaySize))
+			xdraw.CatmullRom.Scale(dst, dst.Bounds(), canvas, canvas.Bounds(), xdraw.Over, nil)
+			src = dst
+		}
+
 		palettedFrame := image.NewPaletted(image.Rect(0, 0, showgifDisplaySize, showgifDisplaySize), palette.Plan9)
-		draw.Draw(palettedFrame, palettedFrame.Bounds(), canvas, image.Point{}, draw.Src)
+		draw.Draw(palettedFrame, palettedFrame.Bounds(), src, image.Point{}, draw.Src)
 		newFrames[i] = palettedFrame
 
-		// Handle disposal (disposal=2 means restore to background)
 		if i < len(g.Disposal) && g.Disposal[i] == gif.DisposalBackground {
 			draw.Draw(canvas, bounds, image.Black, image.Point{}, draw.Src)
 		}
