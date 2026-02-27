@@ -349,7 +349,7 @@ Image File (PNG/JPEG/GIF)
     ↓
 image.Decode() → Go image.Image
     ↓
-Validate 64x64 dimensions
+Auto-resize to target size (CatmullRom) if needed
     ↓
 Convert to RGB (12,288 bytes)
     ↓

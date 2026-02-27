@@ -89,6 +89,7 @@ go test ./...
 
 - `tinygo.org/x/bluetooth` - BLE communication
 - `github.com/spf13/cobra` - CLI framework
+- `golang.org/x/image/draw` - High-quality image resizing (CatmullRom)
 - Standard library `image`, `image/gif`, `image/png`
 
 ## Common Tasks
