@@ -31,4 +31,5 @@ func init() {
 	rootCmd.AddCommand(ShowimageCmd)
 	rootCmd.AddCommand(TextCmd)
 	rootCmd.AddCommand(SnakeCmd)
+	rootCmd.AddCommand(TetrisCmd)
 }

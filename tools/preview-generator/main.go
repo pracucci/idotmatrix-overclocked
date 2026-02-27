@@ -13,6 +13,7 @@ import (
 
 	"github.com/pracucci/idotmatrix-overclocked/pkg/fire"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/games/snake"
+	"github.com/pracucci/idotmatrix-overclocked/pkg/games/tetris"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/graphic"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/grot"
 	"github.com/pracucci/idotmatrix-overclocked/pkg/text"
@@ -54,6 +55,12 @@ func main() {
 	fmt.Println("Generating fire preview...")
 	if err := generateFirePreview(filepath.Join(previewDir, "fire-preview.gif")); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to generate fire preview: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Generating tetris preview...")
+	if err := generateTetrisPreview(filepath.Join(previewDir, "tetris-preview.gif")); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to generate tetris preview: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -216,6 +223,69 @@ func brightenBackground(buf []byte) {
 			buf[i+2] = min(255, b*3)
 		}
 	}
+}
+
+// generateTetrisPreview creates a tetris game preview GIF with two phases:
+// 1. Cover image (1s)
+// 2. Gameplay simulation - T piece dropping to the bottom
+func generateTetrisPreview(outputPath string) error {
+	var frames []*image.Paletted
+	var delays []int
+
+	// Phase 1: Cover image (1 second)
+	coverBuf := tetris.GenerateCoverImage()
+	coverFrame := graphic.RGBToPaletted(coverBuf)
+	frames = append(frames, coverFrame)
+	delays = append(delays, 100) // 1 second
+
+	// Phase 2: Gameplay simulation - T piece dropping from top to bottom
+	background := tetris.GenerateGameBackground()
+	board := tetris.NewBoard()
+
+	renderer := &tetris.Renderer{}
+	renderer.SetPrevBuffer(background)
+
+	// T piece at rotation 0 has cells at relative positions: (1,0), (0,1), (1,1), (2,1)
+	// So the lowest cell is at Y+1, meaning piece can go to Y = BoardHeight - 2
+	maxY := tetris.BoardHeight - 2
+
+	for pieceY := 0; pieceY <= maxY; pieceY++ {
+		currentPiece := tetris.Tetromino{
+			Type:     tetris.TetrominoT,
+			Rotation: tetris.Rotation0,
+			X:        3,
+			Y:        pieceY,
+		}
+
+		renderer.RenderState(board, &currentPiece, background)
+		frameBuf := renderer.GetCurrBuffer()
+
+		// Make a copy of the buffer for the frame
+		frameCopy := make([]byte, len(frameBuf))
+		copy(frameCopy, frameBuf)
+
+		frames = append(frames, graphic.RGBToPaletted(frameCopy))
+		delays = append(delays, 10) // 100ms per frame
+	}
+
+	// Encode and write GIF
+	g := &gif.GIF{
+		Image:     frames,
+		Delay:     delays,
+		LoopCount: 0, // Loop forever
+	}
+
+	f, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create output file: %w", err)
+	}
+	defer f.Close()
+
+	if err := gif.EncodeAll(f, g); err != nil {
+		return fmt.Errorf("failed to encode GIF: %w", err)
+	}
+
+	return nil
 }
 
 // copyFile copies a file from src to dst.
